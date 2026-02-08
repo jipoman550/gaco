@@ -23,6 +23,32 @@ python gaco.py
 gaco.bat      # Windows
 ```
 
+### 🌍 글로벌 설정 (어디서든 실행하기)
+
+`gaco` 폴더를 매번 복사할 필요 없이, 어디서든 실행할 수 있도록 설정할 수 있습니다.
+
+#### Ubuntu / WSL / Mac
+
+`~/.bashrc` 또는 `~/.zshrc` 파일에 다음 alias를 추가하세요:
+
+```bash
+# gaco 경로를 실제 설치 경로로 변경해주세요
+alias gaco='python3 /path/to/your/gaco/gaco.py'
+```
+
+적용 후:
+```bash
+source ~/.bashrc
+cd /path/to/any/project
+gaco
+```
+
+#### Windows (PowerShell)
+
+1. `gaco` 폴더 경로를 복사합니다.
+2. 환경 변수 편집 > Path에 `gaco` 폴더 경로를 추가합니다.
+3. 새로운 터미널을 열고 어디서든 `gaco.bat` 또는 `gaco` 명령어를 실행할 수 있습니다.
+
 ## 설치
 
 ```bash

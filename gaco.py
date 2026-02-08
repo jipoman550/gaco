@@ -60,8 +60,12 @@ def load_api_key() -> str:
     Raises:
         APIKeyError: API 키를 찾을 수 없거나 유효하지 않을 때
     """
+    # 스크립트 파일의 디렉토리 경로 (설치 위치)
+    script_dir = Path(__file__).parent.resolve()
+    env_path = script_dir / ".env"
+
     # .env 파일 로드
-    load_dotenv()
+    load_dotenv(dotenv_path=env_path)
 
     # 환경변수에서 API 키 가져오기
     api_key = os.getenv("GEMINI_API_KEY")
@@ -70,7 +74,7 @@ def load_api_key() -> str:
     if not api_key or api_key.strip() == "":
         raise APIKeyError(
             "❌ GEMINI_API_KEY를 찾을 수 없습니다.\n"
-            "   .env 파일에 GEMINI_API_KEY=your_api_key 형식으로 추가해주세요."
+            f"   {env_path} 파일에 GEMINI_API_KEY=your_api_key 형식으로 추가해주세요."
         )
 
     return api_key.strip()
@@ -182,6 +186,7 @@ def execute_commit(commit_message: str) -> bool:
 def load_gemini_context() -> str:
     """
     GEMINI.md 파일을 읽어 System Prompt로 변환
+    스크립트와 같은 위치에 있는 GEMINI.md 파일을 읽음
 
     Returns:
         str: GEMINI.md 파일의 내용 (System Prompt)
@@ -189,12 +194,14 @@ def load_gemini_context() -> str:
     Raises:
         GeminiFileNotFoundError: GEMINI.md 파일을 찾을 수 없을 때
     """
-    gemini_file = Path.cwd() / "GEMINI.md"
+    # 스크립트 실행 위치가 아닌, 스크립트 파일이 있는 위치를 기준으로 경로 설정
+    script_dir = Path(__file__).parent.resolve()
+    gemini_file = script_dir / "GEMINI.md"
 
     # GEMINI.md 파일 존재 확인
     if not gemini_file.exists():
         raise GeminiFileNotFoundError(
-            "❌ GEMINI.md 파일을 찾을 수 없습니다.\n"
+            f"❌ {gemini_file} 파일을 찾을 수 없습니다.\n"
             "   커밋 메시지 컨벤션 가이드라인 파일을 생성해주세요."
         )
 
