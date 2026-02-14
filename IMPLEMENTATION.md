@@ -1,4 +1,52 @@
-# 🎉 gaco 구현 완료 보고서
+# 🎉 gaco 구현 보고서 (Living Document)
+
+> **Last Updated: 2026-02-14**
+> 이 문서는 프로젝트의 현재 상태를 반영하는 **살아있는 문서**입니다. 새로운 기능이 추가되거나 구조가 변경될 때마다 업데이트됩니다.
+
+---
+
+## 🕒 최근 변경 사항 (Changelog)
+
+### v1.2.0 — 철갑 디코딩 적용 (2026-02-14)
+- `safe_decode()` 함수 추가: UTF-8 → CP949 → Replace 순으로 자동 디코딩
+- `get_staged_diff()`: `text=True` 대신 바이너리 모드로 diff를 가져온 뒤 `safe_decode` 적용
+- `execute_commit()`: 커밋 결과 및 에러 메시지 출력 시 `safe_decode` 적용
+- `load_gemini_context()`: `GEMINI.md`를 바이너리로 읽어 `safe_decode`로 디코딩
+- `edit_commit_message()`: 편집된 임시 파일을 `safe_decode`로 읽기
+
+### v1.1.0 — 메시지 수정 기능 개선 (2026-02-14)
+- 기존 터미널 직접 입력 방식에서 시스템 편집기(`nvim`/`vim`) 호출 방식으로 변경
+- 환경 변수 `EDITOR`를 통한 동적 편집기 선택 로직 구현
+- 임시 파일(`tempfile`)을 활용한 안전한 텍스트 편집 워크플로우 적용
+
+### v1.0.0 — 초기 구현 완료
+- Phase 1~5 전체 구현
+- Gemini API 연동 및 프롬프트 엔지니어링
+- `y/n/e` 사용자 상호작용 CLi
+- 글로벌 실행을 위한 `gaco` 쉘 스크립트 및 `gaco.bat` 래퍼 추가
+- Windows UTF-8 인코딩 강제 설정
+
+---
+
+## 🧠 현재 고민 중인 부분
+
+- **모듈화 구조:** 현재 ~480줄의 `gaco.py`를 `core/`, `services/`, `ui/`로 어떻게 깔끔하게 쪼갤 것인가? (디자인 패턴 적용 고민 중)
+- **테스트 코드:** `test_sample.py`는 더미 파일. 실질적인 단위 테스트(mock 기반) 도입 필요
+- **커밋 메시지 품질:** Gemini가 가끔 ` ``` `을 메시지 앞뒤에 붙이는 문제 → `GEMINI.md` 주의사항에 추가 완료
+
+---
+
+## 🗺️ 로드맵 (Roadmap)
+
+| Phase | 내용 | 상태 |
+|-------|------|------|
+| Phase 1~5 | 핵심 기능 구현 (API, Git, UI, 통합) | ✅ 완료 |
+| Phase 6 | 모듈화 리팩토링 (`gaco.py` 분리) | 📋 계획 |
+| Phase 7 | 단위 테스트 (pytest + mock) | 📋 계획 |
+| Phase 8 | CLI 옵션 추가 (`--dry-run`, `--model` 등) | 💡 아이디어 |
+| Phase 9 | pip 패키지화 (`setup.py` / `pyproject.toml`) | 💡 아이디어 |
+
+---
 
 ## ✅ 구현 완료 항목
 
@@ -23,81 +71,50 @@
 
 #### 2.1 Git 저장소 검증
 - ✅ `is_git_repository()`: .git 폴더 존재 여부 확인
-- ✅ Path 객체를 사용한 안전한 파일 시스템 접근
 
 #### 2.2 Diff 추출 기능
 - ✅ `get_staged_diff()`: git diff --cached 실행
-- ✅ UTF-8 인코딩 명시적 지정
-- ✅ subprocess를 통한 안전한 명령 실행
-- ✅ 빈 diff 검사 및 예외 처리
+- ✅ `safe_decode()`를 통한 다중 인코딩 폴백 디코딩
+- ✅ subprocess를 통한 안전한 명령 실행 (바이너리 모드)
 
 #### 2.3 커밋 실행 기능
-- ✅ `execute_commit()`: git commit -m 실행
-- ✅ 커밋 결과 출력
-- ✅ 성공/실패 상태 반환
+- ✅ `execute_commit()`: git commit -m 실행 (safe_decode 적용)
 
 ---
 
 ### Phase 3: LLM 연동 모듈 ✓
 
 #### 3.1 컨텍스트 로더
-- ✅ `load_gemini_context()`: GEMINI.md 파일 읽기
-- ✅ UTF-8 인코딩으로 안전한 파일 읽기
-- ✅ 파일이 비어있을 경우 기본 프롬프트 제공
+- ✅ `load_gemini_context()`: GEMINI.md 파일 읽기 (safe_decode 적용)
 
 #### 3.2 Gemini API 클라이언트
 - ✅ `initialize_gemini_client()`: API 초기화
-- ✅ gemini-pro 모델 설정
-- ✅ API 키 설정 및 검증
+- ✅ gemini-2.5-flash 모델 사용
 
 #### 3.3 프롬프트 엔지니어링
 - ✅ `generate_commit_message()`: 커밋 메시지 생성
 - ✅ System Prompt + Diff 조합
-- ✅ 구조화된 프롬프트 템플릿
-- ✅ 진행 상황 표시 (로딩 메시지)
 
 ---
 
 ### Phase 4: 사용자 인터페이스 ✓
 
-#### 4.1 CLI 메인 루프
 - ✅ `display_commit_message()`: 메시지 출력
-- ✅ 시각적으로 구분된 출력 (구분선 사용)
-- ✅ 이모지를 활용한 직관적 UI
-
-#### 4.2 사용자 상호작용 처리
 - ✅ `get_user_choice()`: y/n/e 입력 받기
-- ✅ 입력 검증 및 재시도 로직
-- ✅ `edit_commit_message()`: 메시지 수정 모드
-- ✅ 여러 줄 입력 지원
+- ✅ `edit_commit_message()`: 시스템 편집기를 통한 메시지 수정
 - ✅ `handle_user_interaction()`: 전체 상호작용 관리
-- ✅ 순환 구조로 수정 후 재확인 가능
 
 ---
 
 ### Phase 5: 통합 및 테스트 ✓
 
-#### 5.1 모듈 통합
 - ✅ `main()`: 전체 워크플로우 통합
 - ✅ 5단계 진행 상황 표시
-- ✅ 각 단계별 성공 메시지
-
-#### 5.2 엣지 케이스 테스트
-- ✅ Git 저장소 아닌 경우 → `GitNotFoundError`
-- ✅ Staged 파일 없는 경우 → `NoStagedChangesError`
-- ✅ API 키 누락/무효 → `APIKeyError`
-- ✅ GEMINI.md 없는 경우 → `GeminiFileNotFoundError`
-- ✅ 네트워크 오류 → `GacoError`
-- ✅ Ctrl+C 중단 → `KeyboardInterrupt` 처리
-- ✅ 예상치 못한 오류 → 일반 예외 처리
+- ✅ 모든 엣지 케이스 예외 처리
 
 ---
 
 ## 📊 코드 구조 분석
-
-### 전체 라인 수
-- **총 라인:** ~450줄
-- **주석 포함:** 상세한 한글 주석으로 가독성 극대화
 
 ### 함수별 역할
 
@@ -105,6 +122,7 @@
 |--------|------|-------|
 | `load_api_key()` | API 키 로드 및 검증 | 1.1 |
 | `print_error()` | 에러 메시지 출력 | 1.2 |
+| `safe_decode()` | 다중 인코딩 안전 디코딩 | 2.0 |
 | `is_git_repository()` | Git 저장소 확인 | 2.1 |
 | `get_staged_diff()` | Staged 변경사항 추출 | 2.2 |
 | `execute_commit()` | 커밋 실행 | 2.3 |
@@ -113,9 +131,33 @@
 | `generate_commit_message()` | 커밋 메시지 생성 | 3.3 |
 | `display_commit_message()` | 메시지 출력 | 4.1 |
 | `get_user_choice()` | 사용자 선택 입력 | 4.2 |
-| `edit_commit_message()` | 메시지 수정 | 4.2 |
+| `edit_commit_message()` | 편집기로 메시지 수정 | 4.2 |
 | `handle_user_interaction()` | 상호작용 관리 | 4.2 |
 | `main()` | 메인 엔트리포인트 | 5.1 |
+
+### 전체 라인 수
+- **총 라인:** ~476줄
+- **함수:** 14개
+- **커스텀 예외 클래스:** 5개
+
+---
+
+## 📦 파일 구조
+
+```
+gaco/
+├── gaco.py              # 메인 CLI 도구 (~476줄)
+├── gaco                 # Linux/Mac 실행 스크립트 (wrapper)
+├── gaco.bat             # Windows 실행 스크립트 (wrapper)
+├── GEMINI.md            # 커밋 메시지 컨벤션 가이드 (LLM System Prompt)
+├── INSTRUCTIONS.md      # 개발 지침 및 설계 원칙
+├── IMPLEMENTATION.md    # 이 문서 (Living Document)
+├── README.md            # 프로젝트 소개 및 사용법
+├── requirements.txt     # Python 의존성 (google-genai, python-dotenv)
+├── test_sample.py       # 테스트용 샘플 파일
+├── .env                 # API 키 설정 (gitignored)
+└── .gitignore           # Git 무시 패턴
+```
 
 ---
 
@@ -125,12 +167,11 @@
 ```python
 def load_api_key() -> str:
 def get_staged_diff() -> str:
+def safe_decode(binary_data: bytes) -> str:
 def handle_user_interaction(commit_message: str) -> Tuple[bool, str]:
 ```
-- 모든 함수에 타입 힌트 적용
-- 반환 타입 명시로 가독성 향상
 
-### 2. 에러 처리
+### 2. 계층적 에러 처리
 ```python
 try:
     # 작업 수행
@@ -141,201 +182,35 @@ except KeyboardInterrupt:
 except Exception as e:
     # 예상치 못한 예외
 ```
-- 계층적 예외 처리
-- 각 상황별 맞춤 메시지
 
-### 3. 리소스 관리
+### 3. 철갑 디코딩 (safe_decode 패턴)
 ```python
-with open(gemini_file, "r", encoding="utf-8") as f:
-    content = f.read().strip()
+def safe_decode(binary_data: bytes) -> str:
+    for encoding in ['utf-8', 'cp949']:
+        try:
+            return binary_data.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return binary_data.decode('utf-8', errors='replace')
 ```
-- Context Manager 사용
-- 명시적 UTF-8 인코딩
+- 모든 외부 바이너리 입력에 적용
+- 프로그램 중단 없이 최대한 복원
 
-### 4. 단일 책임 원칙
-- 각 함수는 하나의 명확한 역할만 수행
-- 모듈화된 구조로 유지보수 용이
+### 4. 리소스 관리
+- Context Manager(`with`)로 파일 자동 닫기
+- `tempfile`로 편집 후 자동 정리
+- Path 객체로 크로스 플랫폼 호환
 
 ---
 
 ## 🚀 사용 방법
 
-### 1. 환경 설정
 ```bash
-# .env 파일에 API 키 추가
+# 1. 환경 설정
 echo "GEMINI_API_KEY=your_api_key_here" > .env
-
-# 의존성 설치
 pip install -r requirements.txt
-```
 
-### 2. 실행
-```bash
-# 변경사항 스테이징
+# 2. 변경사항 스테이징 후 실행
 git add .
-
-# gaco 실행
-python gaco.py
+python gaco.py    # 또는 ./gaco (Linux) / gaco.bat (Windows)
 ```
-
-### 3. 실행 흐름
-```
-🚀 gaco - Git Auto COmmit
-======================================================================
-
-📌 Step 1: API 키 로드 중...
-✅ API 키 로드 완료
-
-📌 Step 2: Git 변경사항 확인 중...
-✅ 1234 바이트의 변경사항 발견
-
-📌 Step 3: Gemini API 초기화 중...
-✅ Gemini API 초기화 완료
-
-📌 Step 4: 커밋 메시지 생성 중...
-🤖 AI가 커밋 메시지를 생성 중입니다...
-✅ 커밋 메시지 생성 완료
-
-📌 Step 5: 사용자 확인 대기 중...
-======================================================================
-✨ 생성된 커밋 메시지:
-======================================================================
-feat: Implement gaco CLI tool
-
-- Add Git interface module for diff extraction
-- Integrate Gemini API for commit message generation
-- Create user interaction flow with y/n/e options
-======================================================================
-
-[y] 승인하고 커밋  [n] 취소  [e] 메시지 수정
-선택:
-```
-
----
-
-## 📝 주요 주석 설명
-
-### Docstring 형식
-```python
-def function_name(param: type) -> return_type:
-    """
-    함수의 간단한 설명
-
-    Args:
-        param: 매개변수 설명
-
-    Returns:
-        return_type: 반환값 설명
-
-    Raises:
-        ExceptionType: 예외 발생 조건
-    """
-```
-
-### 섹션 구분 주석
-```python
-# ============================================================================
-# Phase X: 모듈명
-# ============================================================================
-```
-- 각 Phase를 명확히 구분
-- 코드 네비게이션 용이
-
-### 인라인 주석
-```python
-# .env 파일 로드
-load_dotenv()
-
-# 환경변수에서 API 키 가져오기
-api_key = os.getenv("GEMINI_API_KEY")
-```
-- 핵심 로직에만 간결한 설명
-- 코드 자체로 설명 가능한 부분은 주석 생략
-
----
-
-## 🔧 기술적 특징
-
-### 1. 의존성 최소화
-- 외부 라이브러리: `google-generativeai`, `python-dotenv`만 사용
-- Git 인터페이스: subprocess로 직접 구현 (GitPython 불필요)
-
-### 2. 크로스 플랫폼 호환성
-- Path 객체 사용으로 Windows/Linux 모두 지원
-- UTF-8 인코딩 명시로 한글 처리 완벽 지원
-
-### 3. 견고한 에러 처리
-- 5개의 커스텀 예외 클래스
-- 모든 외부 호출에 try-except 적용
-- 사용자 친화적 에러 메시지
-
-### 4. 효율적 메모리 관리
-- Context Manager로 파일 자동 닫기
-- 불필요한 변수 재사용 최소화
-- 임베디드 스타일 리소스 관리
-
----
-
-## 🎯 설계 원칙 준수
-
-✅ **단일 책임:** 각 함수는 하나의 역할만 수행
-✅ **Type Hinting:** 모든 함수에 타입 힌트 적용
-✅ **견고한 에러 처리:** 모든 예외 상황 대응
-✅ **UTF-8 인코딩:** 파일 I/O 시 인코딩 명시
-✅ **효율적 리소스 관리:** Context Manager 사용
-
----
-
-## 📦 파일 구조
-
-```
-gaco/
-├── gaco.py              # ✅ 메인 CLI 도구 (450줄)
-├── GEMINI.md            # ✅ 커밋 메시지 컨벤션 가이드
-├── INSTRUCTIONS.md      # ✅ 개발 지침 문서
-├── README.md            # ✅ 프로젝트 문서
-├── requirements.txt     # ✅ Python 의존성 (2개)
-├── .env                 # ⚠️  API 키 설정 필요
-└── IMPLEMENTATION.md    # ✅ 이 문서
-```
-
----
-
-## ⚠️ 다음 단계
-
-### 1. API 키 설정
-```bash
-# .env 파일 편집
-GEMINI_API_KEY=your_actual_api_key_here
-```
-
-### 2. 테스트 실행
-```bash
-# 테스트용 변경사항 만들기
-echo "test" > test.txt
-git add test.txt
-
-# gaco 실행
-python gaco.py
-```
-
-### 3. 실제 프로젝트에서 사용
-```bash
-# 작업 후
-git add .
-python gaco.py
-```
-
----
-
-## 🎉 완료!
-
-모든 Phase (1-5)의 구현이 완료되었습니다!
-- ✅ 총 13개 함수 구현
-- ✅ 5개 커스텀 예외 클래스
-- ✅ 완벽한 에러 처리
-- ✅ 상세한 한글 주석
-- ✅ Type Hinting 적용
-- ✅ 사용자 친화적 UI
-
-이제 `.env` 파일에 API 키만 설정하면 바로 사용 가능합니다! 🚀

@@ -9,6 +9,7 @@ AI 기반 스마트 커밋 메시지 자동 생성 CLI 도구
 - ✅ 사용자 친화적인 대화형 인터페이스
 - ✅ Windows 및 Ubuntu 지원
 - ✅ 최신 google-genai API 사용
+- ✅ 다중 인코딩 자동 감지 (UTF-8, CP949)
 
 ## 사용 방법
 
@@ -63,9 +64,28 @@ pip install -r requirements.txt
 GEMINI_API_KEY=your_api_key_here
 ```
 
+## 🗺️ 로드맵 (Roadmap)
+
+- [x] **Phase 1~5:** 핵심 기능 구현 완료 (API, Git, UI, 통합)
+- [x] **v1.1.0:** 시스템 편집기를 통한 메시지 수정 기능
+- [x] **v1.2.0:** 철갑 디코딩 — 다중 인코딩 자동 감지
+- [ ] **Phase 6:** 모듈화 리팩토링 (`gaco.py` → 패키지 구조)
+- [ ] **Phase 7:** 단위 테스트 (pytest + mock)
+- [ ] **Phase 8:** CLI 옵션 추가 (`--dry-run`, `--model` 등)
+- [ ] **Phase 9:** pip 패키지화 (`pyproject.toml`)
+
 ## 테스트 완료
 
 - ✅ Windows 환경 테스트 완료
 - ✅ Ubuntu WSL 환경 테스트 완료
 - ✅ Deprecated 경고 해결 완료
 - ✅ 실행 파일 생성 완료
+
+## 📚 문서 안내
+
+| 문서 | 역할 |
+|------|------|
+| `README.md` | 프로젝트 소개 및 사용법 (이 문서) |
+| `INSTRUCTIONS.md` | 설계 원칙, 기술 스택, 코딩 표준 |
+| `IMPLEMENTATION.md` | 구현 상세, Changelog, Roadmap |
+| `GEMINI.md` | 커밋 메시지 컨벤션 (LLM System Prompt) |
