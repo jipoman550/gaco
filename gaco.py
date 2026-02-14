@@ -95,6 +95,21 @@ def print_error(message: str) -> None:
 # Phase 2: Git 인터페이스 모듈
 # ============================================================================
 
+def safe_decode(binary_data: bytes) -> str:
+	"""
+	바이너리 데이터를 안전하게 디코딩 (UTF-8 -> CP949 -> Replace 순)
+	"""
+	# 시도해볼 인코딩 순서
+	for encoding in ['utf-8', 'cp949']:
+		try:
+			return binary_data.decode(encoding)
+		except UnicodeDecodeError:
+			continue
+
+	# 모든 시도가 실패하면 깨지는 문자를 '?'로 치환해서라도 반환
+	return binary_data.decode('utf-8', errors='replace')
+
+
 def is_git_repository() -> bool:
 	"""
 	현재 디렉토리가 Git 저장소인지 확인
@@ -126,16 +141,15 @@ def get_staged_diff() -> str:
 		)
 
 	try:
-		# git diff --cached 실행
+		# git diff --cached 실행 (바이너리로 가져옴)
 		result = subprocess.run(
 			["git", "diff", "--cached"],
 			capture_output=True,
-			text=True,
-			encoding="utf-8",
 			check=True
 		)
 
-		diff_output = result.stdout.strip()
+		# 안전한 디코딩 적용
+		diff_output = safe_decode(result.stdout).strip()
 
 		# Staged 변경사항이 없는 경우
 		if not diff_output:
@@ -165,18 +179,16 @@ def execute_commit(commit_message: str) -> bool:
 		result = subprocess.run(
 			["git", "commit", "-m", commit_message],
 			capture_output=True,
-			text=True,
-			encoding="utf-8",
 			check=True
 		)
 
 		# 커밋 결과 출력
 		print("\n✅ 커밋이 성공적으로 완료되었습니다!")
-		print(result.stdout)
+		print(safe_decode(result.stdout))
 		return True
 
 	except subprocess.CalledProcessError as e:
-		print_error(f"❌ 커밋 실행 중 오류 발생:\n{e.stderr}")
+		print_error(f"❌ 커밋 실행 중 오류 발생:\n{safe_decode(e.stderr)}")
 		return False
 
 
@@ -207,9 +219,9 @@ def load_gemini_context() -> str:
 		)
 
 	try:
-		# UTF-8 인코딩으로 파일 읽기
-		with open(gemini_file, "r", encoding="utf-8") as f:
-			content = f.read().strip()
+		# 파일을 바이너리로 읽어서 안전하게 디코딩
+		content_bytes = gemini_file.read_bytes()
+		content = safe_decode(content_bytes).strip()
 
 		# 파일이 비어있는 경우 기본 프롬프트 반환
 		if not content:
@@ -345,8 +357,8 @@ def edit_commit_message(original_message: str) -> str:
 		subprocess.run([editor, temp_path], check=True)
 
 		# 3. 수정된 내용 읽기
-		with open(temp_path, 'r', encoding='utf-8') as f:
-			edited_message = f.read().strip()
+		edited_bytes = Path(temp_path).read_bytes()
+		edited_message = safe_decode(edited_bytes).strip()
 
 		if not edited_message:
 			print("⚠️ 메시지가 비어있어 원본 메시지를 사용합니다.")
