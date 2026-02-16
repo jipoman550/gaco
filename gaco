@@ -4,5 +4,6 @@
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Execute the Python script
-python3 "$SCRIPT_DIR/gaco.py" "$@"
+# Execute the Python module
+# We set PYTHONPATH to include the 'src' directory
+PYTHONPATH="$SCRIPT_DIR/src" python3 -m gaco.main "$@"

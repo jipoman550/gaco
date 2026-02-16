@@ -86,6 +86,7 @@ GEMINI_API_KEY=your_api_key_here
 | 문서 | 역할 |
 |------|------|
 | `README.md` | 프로젝트 소개 및 사용법 (이 문서) |
-| `INSTRUCTIONS.md` | 설계 원칙, 기술 스택, 코딩 표준 |
-| `IMPLEMENTATION.md` | 구현 상세, Changelog, Roadmap |
-| `GEMINI.md` | 커밋 메시지 컨벤션 (LLM System Prompt) |
+| `docs/dev/INSTRUCTIONS.md` | 설계 원칙, 기술 스택, 코딩 표준 |
+| `docs/history/IMPLEMENTATION.md` | 구현 상세, Changelog, Roadmap |
+| `docs/config/GEMINI.md` | 커밋 메시지 컨벤션 (LLM System Prompt) |
+| `docs/history/TEST_RESULTS.md` | 테스트 환경 및 결과 증명 |

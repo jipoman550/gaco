@@ -47,22 +47,22 @@
 
 ## 5. 함수 목록 (Function Reference)
 
-| 함수명 | 역할 |
-|--------|------|
-| `load_api_key()` | `.env`에서 API 키 로드 및 검증 |
-| `print_error()` | stderr로 에러 메시지 출력 |
-| `safe_decode()` | 바이너리 → 문자열 안전 디코딩 |
-| `is_git_repository()` | `.git` 폴더 존재 여부 확인 |
-| `get_staged_diff()` | `git diff --cached` 실행 및 디코딩 |
-| `execute_commit()` | `git commit -m` 실행 |
-| `load_gemini_context()` | `GEMINI.md` 로드 (System Prompt) |
-| `initialize_gemini_client()` | Gemini API 클라이언트 초기화 |
-| `generate_commit_message()` | LLM으로 커밋 메시지 생성 |
-| `display_commit_message()` | 생성된 메시지 터미널 출력 |
-| `get_user_choice()` | `y/n/e` 사용자 입력 받기 |
-| `edit_commit_message()` | 시스템 편집기로 메시지 수정 |
-| `handle_user_interaction()` | 전체 사용자 상호작용 관리 |
-| `main()` | 메인 엔트리포인트 |
+| 함수명 | 모듈 | 역할 |
+|--------|------|------|
+| `load_api_key()` | `core.config` | `.env`에서 API 키 로드 및 검증 |
+| `print_error()` | `core.utils` | stderr로 에러 메시지 출력 |
+| `safe_decode()` | `core.utils` | 바이너리 → 문자열 안전 디코딩 |
+| `is_git_repository()` | `core.git` | `.git` 폴더 존재 여부 확인 |
+| `get_staged_diff()` | `core.git` | `git diff --cached` 실행 및 디코딩 |
+| `execute_commit()` | `core.git` | `git commit -m` 실행 |
+| `load_gemini_context()` | `core.config` | `GEMINI.md` 로드 (System Prompt) |
+| `initialize_gemini_client()` | `services.llm` | Gemini API 클라이언트 초기화 |
+| `generate_commit_message()` | `services.llm` | LLM으로 커밋 메시지 생성 |
+| `display_commit_message()` | `ui.terminal` | 생성된 메시지 터미널 출력 |
+| `get_user_choice()` | `ui.terminal` | `y/n/e` 사용자 입력 받기 |
+| `edit_commit_message()` | `ui.editor` | 시스템 편집기로 메시지 수정 |
+| `handle_user_interaction()` | `ui.terminal` | 전체 사용자 상호작용 관리 |
+| `main()` | `main` | 메인 엔트리포인트 (Facade) |
 
 ---
 
