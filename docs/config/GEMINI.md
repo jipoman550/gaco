@@ -37,30 +37,24 @@
 
 ## 예시
 
-```
 feat: Add user authentication module
 
 - Implement login/logout functionality
 - Add JWT token validation
 - Create user session management
 - Add password encryption using bcrypt
-```
 
-```
 fix: Resolve memory leak in data processing
 
 - Fix unclosed file handles in batch processor
 - Add proper cleanup in exception handlers
 - Update resource management pattern
-```
 
-```
 docs: Update API documentation
 
 - Add examples for new endpoints
 - Fix typos in authentication section
 - Update version number to 2.0
-```
 
 ## 주의사항
 
@@ -68,4 +62,3 @@ docs: Update API documentation
 - 너무 일반적이거나 모호한 표현 지양
 - 코드 변경의 핵심 의도를 파악하여 작성
 - 여러 개의 독립적인 변경사항이 있다면 가장 중요한 것을 중심으로 작성
-- ``` 같은 문자를 메세지 맨 앞과 뒤에 사용하지 말 것
