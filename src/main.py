@@ -8,7 +8,7 @@ from core.exceptions import GacoError
 from core.utils import print_error
 from core.config import load_api_key, load_gemini_context
 from core.git import get_staged_diff, execute_commit
-from services.llm import initialize_gemini_client, generate_commit_message
+from services.llm import initialize_llm_client, generate_commit_message
 from ui.terminal import handle_user_interaction
 
 
@@ -35,10 +35,10 @@ def main() -> int:
         print(f"✅ {len(diff)} 바이트의 변경사항 발견")
 
         # Phase 3: LLM 연동
-        print("\n📌 Step 3: Gemini API 초기화 중...")
+        print("\n📌 Step 3: LLM API 초기화 중...")
         system_prompt = load_gemini_context()
-        client = initialize_gemini_client(api_key)
-        print("✅ Gemini API 초기화 완료")
+        client = initialize_llm_client(api_key)
+        print("✅ LLM API 초기화 완료")
 
         print("\n📌 Step 4: 커밋 메시지 생성 중...")
         commit_message = generate_commit_message(client, system_prompt, diff)
