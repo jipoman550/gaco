@@ -1,8 +1,9 @@
 """
 로컬 Ollama API 연동 관련 서비스 모듈 (OpenAI 호환 API 활용)
 """
+import os 
 from openai import OpenAI
-from .core.exceptions import GacoError, APIKeyError
+from core.exceptions import GacoError, APIKeyError
 
 def initialize_gemini_client(api_key: str) -> OpenAI:
     """
@@ -16,10 +17,12 @@ def initialize_gemini_client(api_key: str) -> OpenAI:
         OpenAI: 초기화된 OpenAI 클라이언트 인스턴스 (Ollama 바인딩)
     """
     try:
-        # 포트 11435번의 Ollama 서버를 OpenAI 호환 엔드포인트(/v1)로 연결
+        # 환경변수 OLLAMA_HOST가 있으면 그걸 쓰고, 없으면 기본값으로 42 클러스터용 우회 포트를 바라봅니다.
+        ollama_endpoint = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11435/v1")
+        
         client = OpenAI(
-            base_url="http://127.0.0.1:11435/v1",
-            api_key="ollama-local"  # 로컬이므로 아무 값이나 넣어도 작동합니다.
+            base_url=ollama_endpoint,
+            api_key="ollama-local"
         )
         return client
 

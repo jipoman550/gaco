@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from ..core.utils import safe_decode
+from core.utils import safe_decode
 
 def edit_commit_message(original_message: str) -> str:
     """

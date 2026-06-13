@@ -2,7 +2,7 @@
 터미널 입출력 관련 모듈
 """
 from typing import Tuple
-from .editor import edit_commit_message
+from ui.editor import edit_commit_message
 
 def display_commit_message(message: str) -> None:
     """

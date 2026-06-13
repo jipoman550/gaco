@@ -4,12 +4,12 @@ gaco 메인 엔트리포인트 (Facade)
 import sys
 
 # gaco 패키지 내부 모듈 임포트
-from .core.exceptions import GacoError
-from .core.utils import print_error
-from .core.config import load_api_key, load_gemini_context
-from .core.git import get_staged_diff, execute_commit
-from .services.llm import initialize_gemini_client, generate_commit_message
-from .ui.terminal import handle_user_interaction
+from core.exceptions import GacoError
+from core.utils import print_error
+from core.config import load_api_key, load_gemini_context
+from core.git import get_staged_diff, execute_commit
+from services.llm import initialize_gemini_client, generate_commit_message
+from ui.terminal import handle_user_interaction
 
 
 def main() -> int:
