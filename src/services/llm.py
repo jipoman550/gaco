@@ -58,7 +58,7 @@ def generate_commit_message(client: OpenAI, system_prompt: str, diff: str) -> st
 
 위 변경사항에 대한 커밋 메시지를 생성해주세요:"""
 
-        print("\n🤖 로컬 AI(Qwen2.5-Coder-3B)가 커밋 메시지를 분석 중입니다...", flush=True)
+        print("\n🤖 로컬 AI(Qwen2.5-Coder-7B)가 커밋 메시지를 분석 중입니다...", flush=True)
 
         response = client.chat.completions.create(
             model="qwen2.5-coder:7b",
