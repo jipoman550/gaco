@@ -5,11 +5,12 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-from .exceptions import APIKeyError, GeminiFileNotFoundError, GacoError
+from .exceptions import APIKeyError, PromptFileNotFoundError, GacoError
 from .utils import safe_decode
 
 def load_api_key() -> str:
     """
+    의미가 없는 함수인듯...?
     현재 실행 중인 프로젝트 루트 디렉토리의 .env 파일에서 GEMINI_API_KEY를 로드하고 반환
     """
     # 현재 터미널이 위치한 프로젝트 폴더(gaco) 기준으로 .env 경로 고정
@@ -25,19 +26,19 @@ def load_api_key() -> str:
     # API 키 유효성 검사 (로컬 우회용 dummy key도 통과됨)
     if not api_key or api_key.strip() == "":
         raise APIKeyError(
-            "❌ GEMINI_API_KEY를 찾을 수 없습니다.\n"
-            f"   {env_path} 파일에 GEMINI_API_KEY=your_api_key 형식으로 추가해주세요."
+            "❌ LLM_API_KEY를 찾을 수 없습니다.\n"
+            f"   {env_path} 파일에 LLM_API_KEY=your_api_key 형식으로 추가해주세요."
         )
 
     return api_key.strip()
 
 
-def load_gemini_context() -> str:
+def load_system_prompt() -> str:
     """
-    docs/config/GEMINI.md 파일을 읽어 System Prompt로 변환
+    docs/config/CONVENTION.md 파일을 읽어 System Prompt로 변환
     """
     project_root = Path.cwd()
-    gemini_file = project_root / "docs" / "config" / "GEMINI.md"
+    gemini_file = project_root / "docs" / "config" / "CONVENTION.md"
 
     # GEMINI.md 파일 존재 확인
     if not gemini_file.exists():

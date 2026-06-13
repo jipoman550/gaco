@@ -22,6 +22,6 @@ class APIKeyError(GacoError):
     pass
 
 
-class GeminiFileNotFoundError(GacoError):
-    """docs/config/GEMINI.md 파일을 찾을 수 없을 때 발생하는 예외"""
+class PromptFileNotFoundError(GacoError):
+    """docs/config/CONVENTION.md 파일을 찾을 수 없을 때 발생하는 예외"""
     pass

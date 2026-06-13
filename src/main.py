@@ -6,7 +6,7 @@ import sys
 # gaco 패키지 내부 모듈 임포트
 from core.exceptions import GacoError
 from core.utils import print_error
-from core.config import load_api_key, load_gemini_context
+from core.config import load_api_key, load_system_prompt
 from core.git import get_staged_diff, execute_commit
 from services.llm import initialize_llm_client, generate_commit_message
 from ui.terminal import handle_user_interaction
@@ -36,7 +36,7 @@ def main() -> int:
 
         # Phase 3: LLM 연동
         print("\n📌 Step 3: LLM API 초기화 중...")
-        system_prompt = load_gemini_context()
+        system_prompt = load_system_prompt()
         client = initialize_llm_client(api_key)
         print("✅ LLM API 초기화 완료")
 

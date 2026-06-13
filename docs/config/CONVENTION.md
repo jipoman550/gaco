@@ -4,11 +4,10 @@
 
 ## 커밋 메시지 형식
 
-```
 <type>: <subject>
 
 <body>
-```
+
 
 ## Type 종류
 
@@ -44,17 +43,20 @@ feat: Add user authentication module
 - Create user session management
 - Add password encryption using bcrypt
 
+
 fix: Resolve memory leak in data processing
 
 - Fix unclosed file handles in batch processor
 - Add proper cleanup in exception handlers
 - Update resource management pattern
 
+
 docs: Update API documentation
 
 - Add examples for new endpoints
 - Fix typos in authentication section
 - Update version number to 2.0
+
 
 ## 주의사항
 
