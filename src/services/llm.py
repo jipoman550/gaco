@@ -61,12 +61,12 @@ def generate_commit_message(client: OpenAI, system_prompt: str, diff: str) -> st
         print("\n🤖 로컬 AI(Qwen2.5-Coder-3B)가 커밋 메시지를 분석 중입니다...", flush=True)
 
         response = client.chat.completions.create(
-            model="qwen2.5-coder:3b",
+            model="qwen2.5-coder:7b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.2
+            temperature=0.0
         )
         return response.choices[0].message.content.strip()
 
