@@ -4,13 +4,13 @@ AI 기반 스마트 커밋 메시지 자동 생성 CLI 도구
 
 ## 주요 기능
 
-- ✅ Git diff 자동 분석[cite: 4]
+- ✅ Git diff 자동 분석
 - ✅ 로컬 AI (Ollama - Qwen2.5-Coder-3B) 기반 완전 무료 연동 지원
 - ✅ 42 클러스터 PC 및 개인 노트북(WSL2 NAT) 완벽 호환 원격 서버 바인딩
-- ✅ 사용자 친화적인 대화형 인터페이스[cite: 4]
-- ✅ Windows 및 Ubuntu WSL 지원[cite: 4]
+- ✅ 사용자 친화적인 대화형 인터페이스
+- ✅ Windows 및 Ubuntu WSL 지원
 - ✅ 패키지 구조 리팩토링 및 가상환경(venv) 기반 모듈화 완료
-- ✅ 다중 인코딩 자동 감지 (UTF-8, CP949)[cite: 4]
+- ✅ 다중 인코딩 자동 감지 (UTF-8, CP949)
 
 ## 사용 방법
 
@@ -19,7 +19,7 @@ AI 기반 스마트 커밋 메시지 자동 생성 CLI 도구
 source .venv/bin/activate
 
 # 파일 변경 후
-git add .[cite: 4]
+git add .
 
 # gaco 실행
 python src/main.py
