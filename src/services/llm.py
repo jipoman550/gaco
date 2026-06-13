@@ -7,18 +7,20 @@ from core.exceptions import GacoError, APIKeyError
 
 def initialize_gemini_client(api_key: str) -> OpenAI:
     """
-    기존 Gemini 초기화 함수 이름을 유지하여 main.py와의 호환성을 깨지 않고,
-    내부적으로는 우리 포트(11435)를 바라보는 OpenAI 클라이언트를 반환합니다.
-
-    Args:
-        api_key: 로컬 구동이므로 아무 문자열이나 들어와도 무방합니다.
-
-    Returns:
-        OpenAI: 초기화된 OpenAI 클라이언트 인스턴스 (Ollama 바인딩)
+    기존 Gemini 초기화 함수 이름을 유지하여 호환성을 깨지 않고,
+    노트북 환경(WSL2 -> Windows 호스트)과 42 클러스터 환경을 모두 지원합니다.
     """
     try:
-        # 환경변수 OLLAMA_HOST가 있으면 그걸 쓰고, 없으면 기본값으로 42 클러스터용 우회 포트를 바라봅니다.
-        ollama_endpoint = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11435/v1")
+        # 1. 시스템에 OLLAMA_HOST 환경변수가 설정되어 있다면 최우선으로 사용 (42 클러스터 대응용)
+        ollama_endpoint = "http://172.20.64.1:11434/v1"
+        
+        
+        if not ollama_endpoint:
+            # 2. 환경변수가 없다면 현재 노트북(WSL2 -> Windows 호스트 통신) 환경으로 간주
+            # WSL2 내부에서 127.0.0.1은 우분투 내부를 돌지만, 'localhost'는 윈도우 호스트 포트 포워딩을 탑니다.
+            ollama_endpoint = "http://localhost:11434/v1"
+            
+        print(f"\n🔗 연결 중인 Ollama 엔드포인트: {ollama_endpoint}")
         
         client = OpenAI(
             base_url=ollama_endpoint,
