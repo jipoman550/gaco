@@ -1,24 +1,35 @@
 """
 로컬 Ollama API 연동 관련 서비스 모듈 (OpenAI 호환 API 활용)
 """
-import os 
+import os
+import subprocess
 from openai import OpenAI
 from core.exceptions import GacoError, APIKeyError
 
+def _get_wsl_host_ip() -> str:
+    """WSL2 우분투 안에서 실시간으로 윈도우 본체(호스트)의 가상 IP를 찾아 반환합니다."""
+    try:
+        # ip route 명령어를 실행하여 default 게이트웨이(윈도우) IP 추출
+        cmd = "ip route | grep default | awk '{print $3}'"
+        host_ip = subprocess.check_output(cmd, shell=True).decode("utf-8").strip()
+        if host_ip:
+            return f"http://{host_ip}:11434/v1"
+    except Exception:
+        pass
+    # 실패 시 최후의 보루로 localhost 반환
+    return "http://localhost:11434/v1"
+
 def initialize_gemini_client(api_key: str) -> OpenAI:
     """
-    기존 Gemini 초기화 함수 이름을 유지하여 호환성을 깨지 않고,
-    노트북 환경(WSL2 -> Windows 호스트)과 42 클러스터 환경을 모두 지원합니다.
+    노트북 환경(WSL2 동적 IP 자동 추적)과 42 클러스터 환경을 완벽하게 동시 지원합니다.
     """
     try:
         # 1. 시스템에 OLLAMA_HOST 환경변수가 설정되어 있다면 최우선으로 사용 (42 클러스터 대응용)
-        ollama_endpoint = "http://172.20.64.1:11434/v1"
-        
+        ollama_endpoint = os.getenv("OLLAMA_HOST")
         
         if not ollama_endpoint:
-            # 2. 환경변수가 없다면 현재 노트북(WSL2 -> Windows 호스트 통신) 환경으로 간주
-            # WSL2 내부에서 127.0.0.1은 우분투 내부를 돌지만, 'localhost'는 윈도우 호스트 포트 포워딩을 탑니다.
-            ollama_endpoint = "http://localhost:11434/v1"
+            # 2. 환경변수가 없다면 현재 노트북(WSL2) 환경으로 간주하여 실시간으로 윈도우 IP 추적
+            ollama_endpoint = _get_wsl_host_ip()
             
         print(f"\n🔗 연결 중인 Ollama 엔드포인트: {ollama_endpoint}")
         
