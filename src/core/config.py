@@ -14,7 +14,7 @@ def load_api_key() -> str:
     현재 실행 중인 프로젝트 루트 디렉토리의 .env 파일에서 GEMINI_API_KEY를 로드하고 반환
     """
     # 현재 터미널이 위치한 프로젝트 폴더(gaco) 기준으로 .env 경로 고정
-    project_root = Path.cwd()
+    project_root = Path(__file__).resolve().parents[2]
     env_path = project_root / ".env"
 
     # .env 파일 로드
@@ -37,12 +37,12 @@ def load_system_prompt() -> str:
     """
     docs/config/CONVENTION.md 파일을 읽어 System Prompt로 변환
     """
-    project_root = Path.cwd()
+    project_root = Path(__file__).resolve().parents[2]
     gemini_file = project_root / "docs" / "config" / "CONVENTION.md"
 
     # GEMINI.md 파일 존재 확인
     if not gemini_file.exists():
-        raise GeminiFileNotFoundError(
+        raise PromptFileNotFoundError(
             f"❌ {gemini_file} 파일을 찾을 수 없습니다.\n"
             "   커밋 메시지 컨벤션 가이드라인 파일을 생성해주세요."
         )
