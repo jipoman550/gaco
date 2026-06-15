@@ -25,13 +25,14 @@ def initialize_llm_client(api_key: str) -> OpenAI:
     try:
         # 1. 시스템에 OLLAMA_HOST 환경변수가 설정되어 있다면 가져옴
         ollama_endpoint = os.getenv("OLLAMA_HOST")
-        
-        # 윈도우 환경변수 127.0.0.1이 WSL2로 잘못 넘어왔거나 변수가 없다면 강제로 진짜 윈도우 IP 추적
-        if not ollama_endpoint or "127.0.0.1" in ollama_endpoint:
+
+        # 💡 [교정] OLLAMA_HOST 환경변수가 아예 없을 때만 노트북 WSL2용 윈도우 IP 추적을 가동합니다.
+        # 이렇게 하면 42 PC에서 환경변수로 명시한 주소(127.0.0.1:11435 등)가 그대로 존중됩니다.
+        if not ollama_endpoint:
             ollama_endpoint = _get_wsl_host_ip()
-            
+
         print(f"\n🔗 연결 중인 Ollama 엔드포인트: {ollama_endpoint}")
-        
+
         client = OpenAI(
             base_url=ollama_endpoint,
             api_key="ollama-local"
