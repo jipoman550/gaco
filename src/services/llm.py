@@ -9,7 +9,6 @@ from core.exceptions import GacoError, APIKeyError
 def _get_wsl_host_ip() -> str:
     """WSL2 우분투 안에서 실시간으로 윈도우 본체(호스트)의 가상 IP를 찾아 반환합니다."""
     try:
-        # NAT 모드에서 수시로 바뀌는 윈도우 호스트의 가상 게이트웨이 IP를 실시간 추출
         cmd = "ip route | grep default | awk '{print $3}'"
         host_ip = subprocess.check_output(cmd, shell=True).decode("utf-8").strip()
         if host_ip:
@@ -23,13 +22,36 @@ def initialize_llm_client(api_key: str) -> OpenAI:
     노트북 NAT 환경(동적 IP 자동 추적)과 42 클러스터 환경을 완벽하게 동시 지원합니다.
     """
     try:
-        # 1. 시스템에 OLLAMA_HOST 환경변수가 설정되어 있다면 가져옴
+        # 1. 시스템 환경변수 확인
         ollama_endpoint = os.getenv("OLLAMA_HOST")
 
-        # 💡 [핵심 방어 코드] 윈도우 변수(127.0.0.1)가 WSL2로 잘못 넘어왔거나 변수가 아예 없다면
-        # 환경변수를 무시하고 진짜 윈도우 가상 IP(172.X.X.1)를 강제로 추적하도록 고정합니다.
-        if not ollama_endpoint or "127.0.0.1" in ollama_endpoint or "localhost" in ollama_endpoint:
-            ollama_endpoint = _get_wsl_host_ip()
+        # 💡 [황금 밸런스 방어 코드]
+        # 환경변수에 127.0.0.1이나 localhost가 들어왔을 때,
+        # 진짜 윈도우 WSL2 환경('Microsoft' 문구가 OS 릴리즈에 포함됨)일 때만 가상 IP를 추적합니다.
+        # 42 클러스터 순수 리눅스/맥 환경이라면 이 조건을 스킵하고 127.0.0.1을 그대로 고수합니다!
+        is_wsl = False
+        try:
+            if os.path.exists("/proc/version"):
+                with open("/proc/version", "r") as f:
+                    if "microsoft" in f.read().lower():
+                        is_wsl = True
+        except Exception:
+            pass
+
+        # WSL2 환경일 때만 127.0.0.1을 윈도우 가상 IP로 치환
+        if is_wsl:
+            if not ollama_endpoint or "127.0.0.1" in ollama_endpoint or "localhost" in ollama_endpoint:
+                ollama_endpoint = _get_wsl_host_ip()
+        else:
+            # 42 클러스터 등 순수 유닉스/리눅스 환경에서는 환경변수가 없거나 부실하면 127.0.0.1 로컬로 고정
+            if not ollama_endpoint:
+                ollama_endpoint = "http://127.0.0.1:11434/v1"
+
+            # 유저가 강제로 http:// 없이 IP만 적었을 경우를 대비한 유틸리티 보정
+            if not ollama_endpoint.startswith("http"):
+                ollama_endpoint = f"http://{ollama_endpoint}"
+            if not ollama_endpoint.endswith("/v1"):
+                ollama_endpoint = f"{ollama_endpoint}/v1" if ollama_endpoint.endswith("/") else f"{ollama_endpoint}/v1"
 
         print(f"\n🔗 연결 중인 Ollama 엔드포인트: {ollama_endpoint}")
 
@@ -46,23 +68,29 @@ def initialize_llm_client(api_key: str) -> OpenAI:
 def generate_commit_message(client: OpenAI, system_prompt: str, diff: str) -> str:
     """System Prompt와 Diff를 조합하여 로컬 Ollama API로 커밋 메시지 생성"""
     try:
-        user_prompt = f"""아래는 git diff --cached의 결과입니다. 이 변경사항을 분석하여 적절한 커밋 메시지를 생성해주세요.
+        target_model = os.getenv("OLLAMA_MODEL", "qwen2.5-coder:7b")
 
-커밋 메시지 형식:
-- 첫 줄: 간결한 요약 (50자 이내, 명령형)
-- 빈 줄
-- 상세 설명 (필요시, 각 항목을 bullet point로)
+        user_prompt = f"""Analyze the following git diff --cached result and generate a professional commit message STRICTLY in English.
+
+Commit Message Format:
+- First line: Concise summary (under 50 chars, imperative mood)
+- Blank line
+- Detailed description (bullet points starting with '-')
+
+CRITICAL REQUIREMENT:
+- DO NOT use Korean. Output must be 100% English.
+- Follow the system convention strictly.
 
 ---
 {diff}
 ---
 
-위 변경사항에 대한 커밋 메시지를 생성해주세요:"""
+Generate the English commit message:"""
 
-        print("\n🤖 로컬 AI(Qwen2.5-Coder-7B)가 커밋 메시지를 분석 중입니다...", flush=True)
+        print(f"\n🤖 로컬 AI({target_model})가 커밋 메시지를 분석 중입니다...", flush=True)
 
         response = client.chat.completions.create(
-            model="qwen2.5-coder:7b",
+            model=target_model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
