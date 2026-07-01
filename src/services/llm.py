@@ -96,7 +96,7 @@ Generate the English commit message:"""
                 {"role": "user", "content": user_prompt}
             ],
             temperature=0.0,
-            timeout=300.0
+            timeout=600.0
         )
         return response.choices[0].message.content.strip()
 
